@@ -1,8 +1,7 @@
 <?php
-
 /*
- * Copyright (C) 2017 Fabian Franz
- * Copyright (C) 2017-2021 Michael Muenz <m.muenz@gmail.com>
+ * Copyright (C) 2025 Cedrik Pischem
+ * Copyright (C) 2025 Deciso B.V.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -10,6 +9,7 @@
  *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
+ *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
@@ -26,17 +26,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace OPNsense\Quagga;
+namespace OPNsense\System\Status;
 
-class BfdController extends \OPNsense\Base\IndexController
+use OPNsense\System\AbstractStatus;
+use OPNsense\System\SystemStatusCode;
+
+class CaddyOverrideStatus extends AbstractStatus
 {
-    public function indexAction()
+    public function __construct()
     {
-        $this->view->bfdForm = $this->getForm("bfd");
+        $this->internalPriority = 2;
+        $this->internalPersistent = true;
+        $this->internalIsBanner = true;
+        $this->internalTitle = gettext('Caddy config override');
+        $this->internalScope = [
+            '/ui/caddy/layer4',
+            '/ui/caddy/diagnostics',
+            '/ui/caddy/reverse_proxy',
+            '/ui/caddy/general'
+        ];
+    }
 
-        $this->view->formDialogEditBFDNeighbor = $this->getForm("dialogEditBFDNeighbor");
-        $this->view->formGridEditBFDNeighbor = $this->getFormGrid("dialogEditBFDNeighbor", null, "BFDChangeMessage");
-
-        $this->view->pick('OPNsense/Quagga/bfd');
+    public function collectStatus()
+    {
+        if (count(glob('/usr/local/etc/caddy/caddy.d/*'))) {
+            $this->internalMessage = gettext(
+                'The configuration contains manual overwrites, these may interfere with the settings configured here.'
+            );
+            $this->internalStatus = SystemStatusCode::NOTICE;
+        }
     }
 }
