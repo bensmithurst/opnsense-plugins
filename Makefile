@@ -43,19 +43,23 @@ all:
 list:
 .for PLUGIN_DIR in ${PLUGIN_DIRS}
 	@echo ${PLUGIN_DIR} -- $$(${MAKE} -C ${PLUGIN_DIR} -v PLUGIN_COMMENT) \
+	    $$(if [ "$$(${MAKE} -C ${PLUGIN_DIR} -v PLUGIN_MAINTAINER)" = "N/A" ]; then echo "(not maintained)"; fi) \
 	    $$(if [ -n "$$(${MAKE} -C ${PLUGIN_DIR} -v PLUGIN_DEVEL _PLUGIN_DEVEL=)" ]; then echo "(development only)"; fi) \
 	    $$(if [ -n "$$(${MAKE} -C ${PLUGIN_DIR} -v PLUGIN_OBSOLETE)" ]; then echo "(pending removal)"; fi)
 .endfor
 
-# shared targets that are sane to run from the root directory
+# known good targets (expanded below)
 TARGETS=	clean glint lint revision style sweep test
 
-.for TARGET in ${TARGETS}
-${TARGET}:
-.  for PLUGIN_DIR in ${PLUGIN_DIRS}
-	@echo ">>> Entering ${PLUGIN_DIR}"
-	@${MAKE} -C ${PLUGIN_DIR} ${TARGET}
-.  endfor
+.for _TARGET in ${.TARGETS}
+__TARGET=	${TARGETS:M${_TARGET:C/-.*//}}
+.  if "${__TARGET}" != ""
+${_TARGET}:
+.    for PLUGIN_DIR in ${PLUGIN_DIRS}
+	@echo ">>> Entering ${PLUGIN_DIR} with target '${_TARGET}'"
+	@${MAKE} -C ${PLUGIN_DIR} ${_TARGET}
+.    endfor
+.  endif
 .endfor
 
 license:

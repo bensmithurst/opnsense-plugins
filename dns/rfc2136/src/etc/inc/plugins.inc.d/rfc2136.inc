@@ -198,15 +198,19 @@ function rfc2136_configure_do($verbose = false, $int = null, $updatehost = '', $
         $upinst .= "\n";  /* mind that trailing newline! */
 
         if ($need_update) {
-            $cmds = "/var/etc/nsupdatecmds{$i}";
-            file_safe($cmds, $upinst);
-            $args = [];
-            $args[] = exec_safe('-k %s', $keyfile);
+            file_safe("/var/etc/nsupdatecmds{$i}", $upinst);
+
+            $frmt = ['/usr/local/bin/nsupdate -k %s'];
+            $args = [$keyfile];
+
             if (isset($dnsupdate['usetcp'])) {
-                $args[] = '-v';
+                $frmt[] = '-v';
             }
-            $args[] = exec_safe('%s', $cmds);
-            mwexecf_bg('/usr/local/bin/nsupdate ' . join(' ', $args));
+
+            $args[] = "/var/etc/nsupdatecmds{$i}";
+            $frmt[] = '%s';
+
+            mwexecfb($frmt, $args);
         }
     }
 
