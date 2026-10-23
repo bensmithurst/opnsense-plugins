@@ -44,6 +44,31 @@
       <help><![CDATA[Use the ID to set the TTL Value of the packet (Original method) rather than DSCP, default is not ticked]]></help>
    </field>
    <field>
+      <id>udpbroadcastrelay.allowcidr</id>
+      <label>Allowed CIDRs</label>
+      <type>select_multiple</type>
+      <style>tokenize</style>
+      <allownew>true</allownew>
+      <help><![CDATA[Only allow packets from these IP source address ranges.]]></help>
+      <advanced>true</advanced>
+   </field>
+   <field>
+      <id>udpbroadcastrelay.blockcidr</id>
+      <label>Blocked CIDRs</label>
+      <type>select_multiple</type>
+      <style>tokenize</style>
+      <allownew>true</allownew>
+      <help><![CDATA[Block packets from these IP source address ranges. Where overlapping CIDRs are specified in the allowed and blocked lists, the most specific match (longest prefix) takes effect.]]></help>
+      <advanced>true</advanced>
+   </field>
+   <field>
+      <id>udpbroadcastrelay.msearch</id>
+      <label>M-SEARCH processing</label>
+      <type>text</type>
+      <help><![CDATA[A space-separated list of SSDP M-SEARCH actions (<code>block</code>, <code>fwd</code>, <code>proxy</code> or <code>dial</code>). Add a comma and a search term to apply an action to that M-SEARCH ST: header only, for example <code>proxy,urn:schemas-upnp-org:device:MediaServer:1 dial</code>. See the <a href="https://github.com/marjohn56/udpbroadcastrelay#usage">udpbroadcastrelay documentation</a> for details.]]></help>
+      <advanced>true</advanced>
+   </field>
+   <field>
       <id>udpbroadcastrelay.description</id>
       <label>Description</label>
       <type>text</type>
